@@ -14,25 +14,28 @@ export async function middleware(request: NextRequest) {
 
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
 
-  if (!process.env.PASSWORD) {
-    // 如果没有设置密码，重定向到警告页面
-    const warningUrl = new URL('/warning', request.url);
-    return NextResponse.redirect(warningUrl);
-  }
-
   // 从cookie获取认证信息
   const authInfo = getAuthInfoFromCookie(request);
 
-  if (!authInfo) {
-    return handleAuthFailure(request, pathname);
-  }
-
   // localstorage模式：在middleware中完成验证
   if (storageType === 'localstorage') {
-    if (!authInfo.password || authInfo.password !== process.env.PASSWORD) {
+    // 如果没有配置PASSWORD环境变量，直接放行
+    if (!process.env.PASSWORD) {
+      return NextResponse.next();
+    }
+
+    if (
+      !authInfo ||
+      !authInfo.password ||
+      authInfo.password !== process.env.PASSWORD
+    ) {
       return handleAuthFailure(request, pathname);
     }
     return NextResponse.next();
+  }
+
+  if (!authInfo) {
+    return handleAuthFailure(request, pathname);
   }
 
   // 其他模式：只验证签名
@@ -133,6 +136,6 @@ function shouldSkipAuth(pathname: string): boolean {
 // 配置middleware匹配规则
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|login|warning|api/login|api/register|api/logout|api/cron|api/server-config).*)',
+    '/((?!_next/static|_next/image|favicon.ico|login|api/login|api/register|api/logout|api/cron|api/server-config).*)',
   ],
 };

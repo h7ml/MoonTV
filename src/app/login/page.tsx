@@ -4,7 +4,7 @@
 
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 
 import { checkForUpdates, CURRENT_VERSION, UpdateStatus } from '@/lib/version';
 
@@ -78,6 +78,26 @@ function LoginPageClient() {
   const [enableRegister, setEnableRegister] = useState(false);
   const { siteName } = useSite();
 
+  const checkAutoLogin = useCallback(async () => {
+    try {
+      // 尝试用空密码登录来检测是否需要密码
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: '' }),
+      });
+
+      if (res.ok) {
+        // 如果成功，说明不需要密码，直接跳转
+        const redirect = searchParams.get('redirect') || '/';
+        router.replace(redirect);
+      }
+    } catch (error) {
+      // 如果失败，正常显示登录表单
+      // 移除console.log避免eslint警告
+    }
+  }, [searchParams, router]);
+
   // 在客户端挂载后设置配置
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -86,8 +106,13 @@ function LoginPageClient() {
       setEnableRegister(
         Boolean((window as any).RUNTIME_CONFIG?.ENABLE_REGISTER)
       );
+
+      // 如果是 localStorage 模式且没有配置密码，尝试自动登录
+      if (storageType === 'localstorage' || !storageType) {
+        checkAutoLogin();
+      }
     }
-  }, []);
+  }, [searchParams, router, checkAutoLogin]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
