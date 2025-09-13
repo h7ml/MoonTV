@@ -521,25 +521,27 @@ export async function getAvailableApiSites(): Promise<ApiSite[]> {
 export async function getLiveSourcesConfig(): Promise<LiveSourceConfig[]> {
   const config = await getConfig();
   const fileConfig = await getFileConfig();
-  
+
   // Merge file config and admin config for live sources
   const fileSources = fileConfig.live_sources || [];
   const adminSources = config.LiveSources || [];
-  
+
   // Combine and deduplicate by ID
   const combinedSources = [...fileSources];
   for (const adminSource of adminSources) {
-    if (!combinedSources.find(s => s.id === adminSource.id)) {
+    if (!combinedSources.find((s) => s.id === adminSource.id)) {
       combinedSources.push(adminSource);
     }
   }
-  
+
   return combinedSources;
 }
 
-export async function saveLiveSourcesConfig(sources: LiveSourceConfig[]): Promise<void> {
+export async function saveLiveSourcesConfig(
+  sources: LiveSourceConfig[]
+): Promise<void> {
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
-  
+
   if (storageType !== 'localstorage') {
     const storage = getStorage();
     if (storage && typeof (storage as any).updateAdminConfig === 'function') {
@@ -557,18 +559,28 @@ export async function saveLiveSourcesConfig(sources: LiveSourceConfig[]): Promis
 export async function getLiveSettings() {
   const config = await getConfig();
   const fileConfig = await getFileConfig();
-  
+
   return {
-    enabled: config.LiveSettings?.enabled ?? fileConfig.live_settings?.enabled ?? true,
-    default_quality: config.LiveSettings?.default_quality ?? fileConfig.live_settings?.default_quality ?? 'HD',
-    auto_play: config.LiveSettings?.auto_play ?? fileConfig.live_settings?.auto_play ?? true,
-    show_thumbnails: config.LiveSettings?.show_thumbnails ?? fileConfig.live_settings?.show_thumbnails ?? true,
+    enabled:
+      config.LiveSettings?.enabled ?? fileConfig.live_settings?.enabled ?? true,
+    default_quality:
+      config.LiveSettings?.default_quality ??
+      fileConfig.live_settings?.default_quality ??
+      'HD',
+    auto_play:
+      config.LiveSettings?.auto_play ??
+      fileConfig.live_settings?.auto_play ??
+      true,
+    show_thumbnails:
+      config.LiveSettings?.show_thumbnails ??
+      fileConfig.live_settings?.show_thumbnails ??
+      true,
   };
 }
 
 export async function saveLiveSettings(settings: any): Promise<void> {
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
-  
+
   if (storageType !== 'localstorage') {
     const storage = getStorage();
     if (storage && typeof (storage as any).updateAdminConfig === 'function') {

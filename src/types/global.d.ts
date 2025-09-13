@@ -4,9 +4,9 @@ declare global {
   interface Window {
     Hls: typeof import('hls.js').default;
   }
-  
+
   interface HTMLVideoElement {
-    hls?: import('hls.js').default;
+    hls?: import('hls.js').default | null;
   }
 }
 
@@ -27,7 +27,7 @@ declare module 'hls.js' {
   }
 
   interface HlsEventData {
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   interface HlsEvents {
@@ -73,7 +73,7 @@ declare module 'hls.js' {
       code: number;
       text: string;
     };
-    networkDetails?: any;
+    networkDetails?: Record<string, unknown>;
   }
 
   class Hls {
@@ -125,10 +125,19 @@ declare module 'hls.js' {
     stopLoad(): void;
     swapAudioCodec(): void;
     recoverMediaError(): void;
-    
-    on(event: string, listener: (event: string, data: HlsEventData) => void): void;
-    off(event: string, listener?: (event: string, data: HlsEventData) => void): void;
-    once(event: string, listener: (event: string, data: HlsEventData) => void): void;
+
+    on(
+      event: string,
+      listener: (event: string, data: HlsEventData) => void
+    ): void;
+    off(
+      event: string,
+      listener?: (event: string, data: HlsEventData) => void
+    ): void;
+    once(
+      event: string,
+      listener: (event: string, data: HlsEventData) => void
+    ): void;
 
     readonly media: HTMLMediaElement | null;
     readonly url: string | null;

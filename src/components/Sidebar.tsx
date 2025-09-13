@@ -2,7 +2,17 @@
 
 'use client';
 
-import { Cat, Clover, Film, Home, Menu, Radio, Search, Star, Tv } from 'lucide-react';
+import {
+  Cat,
+  Clover,
+  Film,
+  Home,
+  Menu,
+  Radio,
+  Search,
+  Star,
+  Tv,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -259,7 +269,8 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
                     decodedActive === decodedItemHref ||
                     (decodedActive.startsWith('/douban') &&
                       decodedActive.includes(`type=${typeMatch}`)) ||
-                    (decodedActive.startsWith('/live') && item.href === '/live');
+                    (decodedActive.startsWith('/live') &&
+                      item.href === '/live');
                   const Icon = item.icon;
                   return (
                     <Link

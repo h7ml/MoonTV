@@ -13,7 +13,7 @@ import {
   Signal,
   Volume2,
   VolumeX,
-  Wifi
+  Wifi,
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -39,7 +39,9 @@ export default function LivePlayPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSourceSelector, setShowSourceSelector] = useState(false);
   const [streamQuality, setStreamQuality] = useState<string | null>(null);
-  const [streamStatus, setStreamStatus] = useState<'connecting' | 'connected' | 'error' | 'idle'>('idle');
+  const [streamStatus, setStreamStatus] = useState<
+    'connecting' | 'connected' | 'error' | 'idle'
+  >('idle');
 
   // Parse URL parameters
   useEffect(() => {
@@ -71,7 +73,7 @@ export default function LivePlayPage() {
     if (channel && videoRef.current) {
       loadVideo();
     }
-  }, [channel, currentUrlIndex]);
+  }, [channel, currentUrlIndex, loadVideo]);
 
   // Auto-hide controls
   useEffect(() => {
@@ -95,12 +97,17 @@ export default function LivePlayPage() {
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    return () =>
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   const processUrl = (url: string) => {
     // 如果当前页面是 HTTP 访问，而直播源是 HTTPS，则使用代理
-    if (typeof window !== 'undefined' && window.location.protocol === 'http:' && url.startsWith('https://')) {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.protocol === 'http:' &&
+      url.startsWith('https://')
+    ) {
       // 提取域名和路径
       const urlObj = new URL(url);
       const host = urlObj.host;
@@ -112,7 +119,11 @@ export default function LivePlayPage() {
     }
 
     // 如果是 HTTP 源但需要代理，也可以使用 httpproxy
-    if (typeof window !== 'undefined' && url.startsWith('http://') && window.location.protocol === 'https:') {
+    if (
+      typeof window !== 'undefined' &&
+      url.startsWith('http://') &&
+      window.location.protocol === 'https:'
+    ) {
       const urlObj = new URL(url);
       const host = urlObj.host;
       const pathname = urlObj.pathname;
@@ -160,7 +171,7 @@ export default function LivePlayPage() {
           });
         });
 
-        hls.on(window.Hls.Events.ERROR, (_event: any, data: any) => {
+        hls.on(window.Hls.Events.ERROR, (_event: string, data: { fatal?: boolean; details?: string }) => {
           if (data.fatal) {
             setError(`播放错误: ${data.details}`);
             setIsLoading(false);
@@ -198,7 +209,6 @@ export default function LivePlayPage() {
         setVolume(video.volume);
         setIsMuted(video.muted);
       });
-
     } catch (err) {
       setError('初始化播放器失败');
       setIsLoading(false);
@@ -253,7 +263,7 @@ export default function LivePlayPage() {
     }
 
     if (currentUrlIndex < channel.urls.length - 1) {
-      setCurrentUrlIndex(prev => prev + 1);
+      setCurrentUrlIndex((prev) => prev + 1);
     } else {
       setCurrentUrlIndex(0);
       loadVideo();
@@ -276,13 +286,13 @@ export default function LivePlayPage() {
   const getStreamStatusIcon = () => {
     switch (streamStatus) {
       case 'connecting':
-        return <Wifi className="w-4 h-4 animate-pulse text-yellow-400" />;
+        return <Wifi className='w-4 h-4 animate-pulse text-yellow-400' />;
       case 'connected':
-        return <Signal className="w-4 h-4 text-green-400" />;
+        return <Signal className='w-4 h-4 text-green-400' />;
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-400" />;
+        return <AlertCircle className='w-4 h-4 text-red-400' />;
       default:
-        return <Monitor className="w-4 h-4 text-gray-400" />;
+        return <Monitor className='w-4 h-4 text-gray-400' />;
     }
   };
 
@@ -335,18 +345,18 @@ export default function LivePlayPage() {
   if (!channel) {
     return (
       <PageLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        <div className='flex items-center justify-center min-h-screen'>
+          <div className='text-center'>
+            <AlertCircle className='w-12 h-12 text-red-500 mx-auto mb-4' />
+            <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
               频道参数错误
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className='text-gray-600 dark:text-gray-300 mb-4'>
               频道参数无效或缺失
             </p>
             <button
               onClick={() => router.push('/live')}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
             >
               返回直播列表
             </button>
@@ -358,16 +368,16 @@ export default function LivePlayPage() {
 
   return (
     <PageLayout>
-      <div className="bg-black min-h-screen relative">
+      <div className='bg-black min-h-screen relative'>
         {/* Video Player */}
         <div
-          className="relative w-full h-screen"
+          className='relative w-full h-screen'
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
           <video
             ref={videoRef}
-            className="w-full h-full object-contain"
+            className='w-full h-full object-contain'
             playsInline
             autoPlay
             muted={isMuted}
@@ -375,13 +385,13 @@ export default function LivePlayPage() {
 
           {/* Loading Overlay */}
           {isLoading && (
-            <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 mb-6"></div>
-                <p className="text-white text-lg mb-2">加载直播流中...</p>
-                <div className="flex items-center justify-center space-x-2 text-gray-300">
+            <div className='absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center'>
+              <div className='text-center'>
+                <div className='animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 mb-6'></div>
+                <p className='text-white text-lg mb-2'>加载直播流中...</p>
+                <div className='flex items-center justify-center space-x-2 text-gray-300'>
                   {getStreamStatusIcon()}
-                  <span className="text-sm">{getStreamStatusText()}</span>
+                  <span className='text-sm'>{getStreamStatusText()}</span>
                 </div>
               </div>
             </div>
@@ -389,31 +399,37 @@ export default function LivePlayPage() {
 
           {/* Error Overlay */}
           {error && (
-            <div className="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center">
-              <div className="text-center max-w-md mx-4">
-                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-6" />
-                <h3 className="text-white text-xl font-semibold mb-4">播放出错</h3>
-                <p className="text-gray-300 mb-6 leading-relaxed">{error}</p>
-                <div className="space-y-3">
-                  <div className="flex space-x-3 justify-center">
+            <div className='absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center'>
+              <div className='text-center max-w-md mx-4'>
+                <AlertCircle className='w-16 h-16 text-red-500 mx-auto mb-6' />
+                <h3 className='text-white text-xl font-semibold mb-4'>
+                  播放出错
+                </h3>
+                <p className='text-gray-300 mb-6 leading-relaxed'>{error}</p>
+                <div className='space-y-3'>
+                  <div className='flex space-x-3 justify-center'>
                     <button
                       onClick={handleRetry}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2 font-medium"
+                      className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2 font-medium'
                     >
-                      <RotateCcw className="w-5 h-5" />
-                      <span>{currentUrlIndex < channel.urls.length - 1 ? '尝试下一源' : '重新连接'}</span>
+                      <RotateCcw className='w-5 h-5' />
+                      <span>
+                        {currentUrlIndex < channel.urls.length - 1
+                          ? '尝试下一源'
+                          : '重新连接'}
+                      </span>
                     </button>
                     <button
                       onClick={() => setShowSourceSelector(true)}
-                      className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2 font-medium"
+                      className='bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2 font-medium'
                     >
-                      <Settings className="w-5 h-5" />
+                      <Settings className='w-5 h-5' />
                       <span>选择源</span>
                     </button>
                   </div>
                   <button
                     onClick={() => router.push('/live')}
-                    className="text-gray-400 hover:text-white transition-colors font-medium"
+                    className='text-gray-400 hover:text-white transition-colors font-medium'
                   >
                     返回直播列表
                   </button>
@@ -423,43 +439,53 @@ export default function LivePlayPage() {
           )}
 
           {/* Controls Overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-t from-black via-transparent to-black pointer-events-none transition-opacity duration-300 ${showControls && !error ? 'opacity-100' : 'opacity-0'}`}>
+          <div
+            className={`absolute inset-0 bg-gradient-to-t from-black via-transparent to-black pointer-events-none transition-opacity duration-300 ${
+              showControls && !error ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
             {/* Top Controls */}
-            <div className="absolute top-0 left-0 right-0 p-6 pointer-events-auto">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+            <div className='absolute top-0 left-0 right-0 p-6 pointer-events-auto'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center space-x-4'>
                   <button
                     onClick={() => router.push('/live')}
-                    className="text-white hover:text-gray-300 transition-colors p-2 rounded-full bg-black bg-opacity-30 hover:bg-opacity-50"
-                    aria-label="返回直播列表"
+                    className='text-white hover:text-gray-300 transition-colors p-2 rounded-full bg-black bg-opacity-30 hover:bg-opacity-50'
+                    aria-label='返回直播列表'
                   >
-                    <ArrowLeft className="w-6 h-6" />
+                    <ArrowLeft className='w-6 h-6' />
                   </button>
-                  <div className="bg-black bg-opacity-30 rounded-lg px-4 py-2 backdrop-blur-sm">
-                    <h1 className="text-white font-semibold text-lg">{channel.name}</h1>
-                    <div className="flex items-center space-x-3 mt-1">
-                      <p className="text-gray-300 text-sm">{channel.category}</p>
-                      <div className="flex items-center space-x-1">
+                  <div className='bg-black bg-opacity-30 rounded-lg px-4 py-2 backdrop-blur-sm'>
+                    <h1 className='text-white font-semibold text-lg'>
+                      {channel.name}
+                    </h1>
+                    <div className='flex items-center space-x-3 mt-1'>
+                      <p className='text-gray-300 text-sm'>
+                        {channel.category}
+                      </p>
+                      <div className='flex items-center space-x-1'>
                         {getStreamStatusIcon()}
-                        <span className="text-xs text-gray-300">{getStreamStatusText()}</span>
+                        <span className='text-xs text-gray-300'>
+                          {getStreamStatusText()}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className='flex items-center space-x-2'>
                   {streamQuality && (
-                    <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium">
+                    <span className='bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium'>
                       {streamQuality}
                     </span>
                   )}
                   {channel.quality && (
-                    <span className="bg-green-600 text-white text-xs px-3 py-1 rounded-full font-medium">
+                    <span className='bg-green-600 text-white text-xs px-3 py-1 rounded-full font-medium'>
                       {channel.quality}
                     </span>
                   )}
                   {channel.urls.length > 1 && (
-                    <span className="bg-gray-600 text-white text-xs px-3 py-1 rounded-full font-medium">
+                    <span className='bg-gray-600 text-white text-xs px-3 py-1 rounded-full font-medium'>
                       源 {currentUrlIndex + 1}/{channel.urls.length}
                     </span>
                   )}
@@ -468,68 +494,72 @@ export default function LivePlayPage() {
             </div>
 
             {/* Bottom Controls */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-auto">
-              <div className="bg-black bg-opacity-40 rounded-lg backdrop-blur-sm p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+            <div className='absolute bottom-0 left-0 right-0 p-6 pointer-events-auto'>
+              <div className='bg-black bg-opacity-40 rounded-lg backdrop-blur-sm p-4'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center space-x-4'>
                     <button
                       onClick={handlePlayPause}
-                      className="text-white hover:text-gray-300 transition-all duration-200 p-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30"
+                      className='text-white hover:text-gray-300 transition-all duration-200 p-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30'
                     >
                       {isPlaying ? (
-                        <Pause className="w-8 h-8" fill="currentColor" />
+                        <Pause className='w-8 h-8' fill='currentColor' />
                       ) : (
-                        <Play className="w-8 h-8 ml-1" fill="currentColor" />
+                        <Play className='w-8 h-8 ml-1' fill='currentColor' />
                       )}
                     </button>
 
-                    <div className="flex items-center space-x-3">
+                    <div className='flex items-center space-x-3'>
                       <button
                         onClick={handleMuteToggle}
-                        className="text-white hover:text-gray-300 transition-colors p-2 rounded"
+                        className='text-white hover:text-gray-300 transition-colors p-2 rounded'
                       >
                         {isMuted ? (
-                          <VolumeX className="w-6 h-6" />
+                          <VolumeX className='w-6 h-6' />
                         ) : (
-                          <Volume2 className="w-6 h-6" />
+                          <Volume2 className='w-6 h-6' />
                         )}
                       </button>
 
-                      <div className="flex items-center space-x-2">
-                        <span className="text-white text-sm font-medium w-8">{Math.round((isMuted ? 0 : volume) * 100)}</span>
+                      <div className='flex items-center space-x-2'>
+                        <span className='text-white text-sm font-medium w-8'>
+                          {Math.round((isMuted ? 0 : volume) * 100)}
+                        </span>
                         <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.1"
+                          type='range'
+                          min='0'
+                          max='1'
+                          step='0.1'
                           value={isMuted ? 0 : volume}
-                          onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                          className="w-24 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer volume-slider"
+                          onChange={(e) =>
+                            handleVolumeChange(parseFloat(e.target.value))
+                          }
+                          className='w-24 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer volume-slider'
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className='flex items-center space-x-2'>
                     {channel.urls.length > 1 && (
                       <button
                         onClick={() => setShowSourceSelector(true)}
-                        className="text-white hover:text-gray-300 transition-colors p-2 rounded bg-white bg-opacity-10 hover:bg-opacity-20"
-                        title="切换源"
+                        className='text-white hover:text-gray-300 transition-colors p-2 rounded bg-white bg-opacity-10 hover:bg-opacity-20'
+                        title='切换源'
                       >
-                        <Settings className="w-5 h-5" />
+                        <Settings className='w-5 h-5' />
                       </button>
                     )}
 
                     <button
                       onClick={handleFullscreen}
-                      className="text-white hover:text-gray-300 transition-colors p-2 rounded bg-white bg-opacity-10 hover:bg-opacity-20"
+                      className='text-white hover:text-gray-300 transition-colors p-2 rounded bg-white bg-opacity-10 hover:bg-opacity-20'
                       title={isFullscreen ? '退出全屏' : '进入全屏'}
                     >
                       {isFullscreen ? (
-                        <Minimize className="w-5 h-5" />
+                        <Minimize className='w-5 h-5' />
                       ) : (
-                        <Maximize className="w-5 h-5" />
+                        <Maximize className='w-5 h-5' />
                       )}
                     </button>
                   </div>
@@ -539,77 +569,90 @@ export default function LivePlayPage() {
           </div>
         </div>
 
-
         {/* Source Selector Modal */}
         {showSourceSelector && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-900 rounded-xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl">
-              <div className="p-6 border-b border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-white text-xl font-semibold">选择播放源</h3>
+          <div className='fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4'>
+            <div className='bg-gray-900 rounded-xl max-w-md w-full max-h-[80vh] overflow-hidden shadow-2xl'>
+              <div className='p-6 border-b border-gray-700'>
+                <div className='flex items-center justify-between'>
+                  <h3 className='text-white text-xl font-semibold'>
+                    选择播放源
+                  </h3>
                   <button
                     onClick={() => setShowSourceSelector(false)}
-                    className="text-gray-400 hover:text-white transition-colors p-1"
+                    className='text-gray-400 hover:text-white transition-colors p-1'
                   >
-                    <ArrowLeft className="w-6 h-6" />
+                    <ArrowLeft className='w-6 h-6' />
                   </button>
                 </div>
-                <p className="text-gray-400 text-sm mt-2">
-                  共 {channel.urls.length} 个源，当前使用源 {currentUrlIndex + 1}
+                <p className='text-gray-400 text-sm mt-2'>
+                  共 {channel.urls.length} 个源，当前使用源{' '}
+                  {currentUrlIndex + 1}
                 </p>
               </div>
 
-              <div className="max-h-96 overflow-y-auto">
+              <div className='max-h-96 overflow-y-auto'>
                 {channel.urls.map((url, index) => {
                   const isActive = index === currentUrlIndex;
-                  const urlObj = new URL(url.startsWith('/') ? `${window.location.origin}${url}` : url);
+                  const urlObj = new URL(
+                    url.startsWith('/')
+                      ? `${window.location.origin}${url}`
+                      : url
+                  );
                   const domain = urlObj.hostname;
 
                   return (
                     <button
                       key={index}
                       onClick={() => handleSourceSelect(index)}
-                      className={`w-full p-4 text-left border-b border-gray-700 transition-all duration-200 ${isActive
+                      className={`w-full p-4 text-left border-b border-gray-700 transition-all duration-200 ${
+                        isActive
                           ? 'bg-blue-600 bg-opacity-20 border-blue-500'
                           : 'hover:bg-gray-800'
-                        }`}
+                      }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-3 h-3 rounded-full ${isActive
-                                ? 'bg-blue-500'
-                                : streamStatus === 'connected' && index === currentUrlIndex
+                      <div className='flex items-center justify-between'>
+                        <div className='flex-1 min-w-0'>
+                          <div className='flex items-center space-x-3'>
+                            <div
+                              className={`w-3 h-3 rounded-full ${
+                                isActive
+                                  ? 'bg-blue-500'
+                                  : streamStatus === 'connected' &&
+                                    index === currentUrlIndex
                                   ? 'bg-green-500'
                                   : 'bg-gray-500'
-                              }`} />
+                              }`}
+                            />
                             <div>
-                              <p className="text-white font-medium">
+                              <p className='text-white font-medium'>
                                 源 {index + 1}
                                 {isActive && (
-                                  <span className="ml-2 text-xs bg-blue-600 px-2 py-0.5 rounded-full">
+                                  <span className='ml-2 text-xs bg-blue-600 px-2 py-0.5 rounded-full'>
                                     当前
                                   </span>
                                 )}
                               </p>
-                              <p className="text-gray-400 text-sm truncate">{domain}</p>
+                              <p className='text-gray-400 text-sm truncate'>
+                                {domain}
+                              </p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-2">
+                        <div className='flex items-center space-x-2'>
                           {url.includes('.m3u8') && (
-                            <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">
+                            <span className='bg-green-600 text-white text-xs px-2 py-1 rounded'>
                               HLS
                             </span>
                           )}
                           {url.includes('https://') && (
-                            <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            <span className='bg-blue-600 text-white text-xs px-2 py-1 rounded'>
                               HTTPS
                             </span>
                           )}
                           {isActive && streamStatus === 'connected' && (
-                            <Signal className="w-4 h-4 text-green-400" />
+                            <Signal className='w-4 h-4 text-green-400' />
                           )}
                         </div>
                       </div>
@@ -618,19 +661,19 @@ export default function LivePlayPage() {
                 })}
               </div>
 
-              <div className="p-6 bg-gray-800 bg-opacity-50">
-                <div className="flex space-x-3">
+              <div className='p-6 bg-gray-800 bg-opacity-50'>
+                <div className='flex space-x-3'>
                   <button
                     onClick={() => setShowSourceSelector(false)}
-                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors font-medium"
+                    className='flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors font-medium'
                   >
                     取消
                   </button>
                   <button
                     onClick={handleRetry}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors font-medium flex items-center justify-center space-x-2"
+                    className='flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors font-medium flex items-center justify-center space-x-2'
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className='w-4 h-4' />
                     <span>重新连接</span>
                   </button>
                 </div>

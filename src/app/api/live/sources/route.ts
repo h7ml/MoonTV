@@ -1,4 +1,4 @@
-import { access,readFile, writeFile } from 'fs/promises';
+import { access, readFile, writeFile } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import { join } from 'path';
 
@@ -34,7 +34,6 @@ export async function GET(request: NextRequest) {
         return handleListSources();
     }
   } catch (error) {
-    console.error('Live sources API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch live sources' },
       { status: 500 }
@@ -62,7 +61,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
-    console.error('Live sources API POST error:', error);
     return NextResponse.json(
       { error: 'Failed to process request' },
       { status: 500 }
@@ -121,7 +119,7 @@ async function handleAddSource(request: NextRequest) {
 
   try {
     const sources = await loadSourcesConfig();
-    
+
     // Generate unique ID
     const newSource: LiveSourceConfig = {
       ...source,
@@ -146,12 +144,15 @@ async function handleUpdateSource(request: NextRequest) {
   const { id, updates } = body;
 
   if (!id || !updates) {
-    return NextResponse.json({ error: 'ID and updates required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'ID and updates required' },
+      { status: 400 }
+    );
   }
 
   try {
     const sources = await loadSourcesConfig();
-    const sourceIndex = sources.findIndex(s => s.id === id);
+    const sourceIndex = sources.findIndex((s) => s.id === id);
 
     if (sourceIndex === -1) {
       return NextResponse.json({ error: 'Source not found' }, { status: 404 });
@@ -184,7 +185,7 @@ async function handleDeleteSource(request: NextRequest) {
 
   try {
     const sources = await loadSourcesConfig();
-    const updatedSources = sources.filter(s => s.id !== id);
+    const updatedSources = sources.filter((s) => s.id !== id);
 
     if (updatedSources.length === sources.length) {
       return NextResponse.json({ error: 'Source not found' }, { status: 404 });
@@ -206,7 +207,10 @@ async function handleImportSource(request: NextRequest) {
   const { url, name, format } = body;
 
   if (!url || !name) {
-    return NextResponse.json({ error: 'URL and name required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'URL and name required' },
+      { status: 400 }
+    );
   }
 
   try {
@@ -217,7 +221,7 @@ async function handleImportSource(request: NextRequest) {
     }
 
     const content = await response.text();
-    
+
     // Parse the content to count channels
     let channelCount = 0;
     let categories: string[] = [];
@@ -226,16 +230,24 @@ async function handleImportSource(request: NextRequest) {
       if (format === 'm3u' || url.includes('.m3u')) {
         const items = LiveChannelParser.parseM3U(content);
         channelCount = items.length;
-        categories = Array.from(new Set(items.map(item => item.category || 'Uncategorized')));
+        categories = Array.from(
+          new Set(items.map((item) => item.category || 'Uncategorized'))
+        );
       } else if (format === 'json') {
         const items = LiveChannelParser.parseJSON(content);
         channelCount = items.length;
-        categories = Array.from(new Set(items.map(item => item.category || 'Uncategorized')));
+        categories = Array.from(
+          new Set(items.map((item) => item.category || 'Uncategorized'))
+        );
       } else {
         // Try Chinese TV format
-        const parsedCategories = LiveChannelParser.parseChineseTVFormat(content);
-        channelCount = parsedCategories.reduce((sum, cat) => sum + cat.channels.length, 0);
-        categories = parsedCategories.map(cat => cat.name);
+        const parsedCategories =
+          LiveChannelParser.parseChineseTVFormat(content);
+        channelCount = parsedCategories.reduce(
+          (sum, cat) => sum + cat.channels.length,
+          0
+        );
+        categories = parsedCategories.map((cat) => cat.name);
       }
     } catch {
       // If parsing fails, still create the source but with unknown counts
@@ -269,7 +281,7 @@ async function handleImportSource(request: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to import source',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
@@ -288,7 +300,7 @@ async function handleRefreshSource(request: NextRequest) {
 
   try {
     const sources = await loadSourcesConfig();
-    const source = sources.find(s => s.id === id);
+    const source = sources.find((s) => s.id === id);
 
     if (!source) {
       return NextResponse.json({ error: 'Source not found' }, { status: 404 });
@@ -302,15 +314,19 @@ async function handleRefreshSource(request: NextRequest) {
       }
 
       const content = await response.text();
-      
+
       // Update channel count and categories
       let channelCount = 0;
       let categories: string[] = [];
 
       try {
-        const parsedCategories = LiveChannelParser.parseChineseTVFormat(content);
-        channelCount = parsedCategories.reduce((sum, cat) => sum + cat.channels.length, 0);
-        categories = parsedCategories.map(cat => cat.name);
+        const parsedCategories =
+          LiveChannelParser.parseChineseTVFormat(content);
+        channelCount = parsedCategories.reduce(
+          (sum, cat) => sum + cat.channels.length,
+          0
+        );
+        categories = parsedCategories.map((cat) => cat.name);
       } catch {
         // Keep existing counts if parsing fails
         channelCount = source.channelCount || 0;
@@ -325,7 +341,7 @@ async function handleRefreshSource(request: NextRequest) {
         lastUpdate: new Date(),
       };
 
-      const sourceIndex = sources.findIndex(s => s.id === id);
+      const sourceIndex = sources.findIndex((s) => s.id === id);
       sources[sourceIndex] = updatedSource;
       await saveSourcesConfig(sources);
 
@@ -337,7 +353,7 @@ async function handleRefreshSource(request: NextRequest) {
         lastUpdate: new Date(),
       };
 
-      const sourceIndex = sources.findIndex(s => s.id === id);
+      const sourceIndex = sources.findIndex((s) => s.id === id);
       sources[sourceIndex] = updatedSource;
       await saveSourcesConfig(sources);
 
@@ -345,7 +361,7 @@ async function handleRefreshSource(request: NextRequest) {
     }
   } catch (error) {
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to refresh source',
         details: error instanceof Error ? error.message : 'Unknown error',
       },

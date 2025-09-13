@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { LiveChannelList } from '@/components/LiveChannelList';
 import PageLayout from '@/components/PageLayout';
@@ -39,15 +39,15 @@ export default function LivePage() {
       quality: channel.quality || 'SD',
       format: channel.format || 'HLS',
     });
-    
+
     router.push(`/live/play?${params.toString()}`);
   };
 
   const handleToggleFavorite = (channel: LiveChannel) => {
-    setFavorites(prev => {
+    setFavorites((prev) => {
       const isCurrentlyFavorite = prev.includes(channel.id);
       if (isCurrentlyFavorite) {
-        return prev.filter(id => id !== channel.id);
+        return prev.filter((id) => id !== channel.id);
       } else {
         return [...prev, channel.id];
       }
@@ -56,7 +56,7 @@ export default function LivePage() {
 
   return (
     <PageLayout>
-      <div className="p-4 sm:p-6 lg:p-8">
+      <div className='p-4 sm:p-6 lg:p-8'>
         <LiveChannelList
           onChannelSelect={handleChannelSelect}
           favorites={favorites}

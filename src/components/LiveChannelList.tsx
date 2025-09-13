@@ -1,9 +1,9 @@
-import { Filter, Grid, List, RefreshCw,Search } from 'lucide-react';
-import React, { useEffect,useState } from 'react';
+import { Filter, Grid, List, RefreshCw, Search } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 import { LiveChannelCard } from './LiveChannelCard';
 
-import { LiveCategory,LiveChannel } from '@/types/live';
+import { LiveCategory, LiveChannel } from '@/types/live';
 
 interface LiveChannelListProps {
   onChannelSelect: (channel: LiveChannel) => void;
@@ -39,17 +39,18 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
 
   // Filter channels based on search and category
   useEffect(() => {
-    let channels = categories.flatMap(cat => cat.channels);
+    let channels = categories.flatMap((cat) => cat.channels);
 
     if (selectedCategory) {
-      channels = channels.filter(ch => ch.category === selectedCategory);
+      channels = channels.filter((ch) => ch.category === selectedCategory);
     }
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      channels = channels.filter(ch => 
-        ch.name.toLowerCase().includes(query) ||
-        ch.category.toLowerCase().includes(query)
+      channels = channels.filter(
+        (ch) =>
+          ch.name.toLowerCase().includes(query) ||
+          ch.category.toLowerCase().includes(query)
       );
     }
 
@@ -58,7 +59,7 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
 
   // Update category stats
   useEffect(() => {
-    const stats = categories.map(cat => ({
+    const stats = categories.map((cat) => ({
       id: cat.id,
       name: cat.name,
       count: cat.channels.length,
@@ -107,7 +108,7 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
   const processChannelUrls = (channel: LiveChannel): LiveChannel => {
     // 如果当前页面是 HTTP 访问，处理 HTTPS 直播源
     if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
-      const processedUrls = channel.urls.map(url => {
+      const processedUrls = channel.urls.map((url) => {
         if (url.startsWith('https://')) {
           try {
             const urlObj = new URL(url);
@@ -121,13 +122,13 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
         }
         return url;
       });
-      
+
       return {
         ...channel,
-        urls: processedUrls
+        urls: processedUrls,
       };
     }
-    
+
     return channel;
   };
 
@@ -144,20 +145,22 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600 dark:text-gray-300">加载频道中...</span>
+      <div className='flex items-center justify-center py-12'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
+        <span className='ml-3 text-gray-600 dark:text-gray-300'>
+          加载频道中...
+        </span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+      <div className='text-center py-12'>
+        <p className='text-red-600 dark:text-red-400 mb-4'>{error}</p>
         <button
           onClick={loadChannels}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
         >
           重试
         </button>
@@ -166,73 +169,79 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between'>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">电视直播</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1">
+          <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
+            电视直播
+          </h1>
+          <p className='text-gray-600 dark:text-gray-300 mt-1'>
             共 {filteredChannels.length} 个频道
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <button
             onClick={refreshChannels}
             disabled={refreshing}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
-            title="刷新频道"
+            className='p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors disabled:opacity-50'
+            title='刷新频道'
           >
-            <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`}
+            />
           </button>
 
-          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className='flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1'>
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded ${viewMode === 'grid' 
-                ? 'bg-white dark:bg-gray-700 shadow text-blue-600' 
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+              className={`p-2 rounded ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-gray-700 shadow text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >
-              <Grid className="w-4 h-4" />
+              <Grid className='w-4 h-4' />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded ${viewMode === 'list' 
-                ? 'bg-white dark:bg-gray-700 shadow text-blue-600' 
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+              className={`p-2 rounded ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-gray-700 shadow text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
               }`}
             >
-              <List className="w-4 h-4" />
+              <List className='w-4 h-4' />
             </button>
           </div>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className='flex flex-col sm:flex-row gap-4'>
         {/* Search */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <div className='relative flex-1'>
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
           <input
-            type="text"
-            placeholder="搜索频道..."
+            type='text'
+            placeholder='搜索频道...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className='w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
           />
         </div>
 
         {/* Category Filter */}
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <div className='relative'>
+          <Filter className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer"
+            className='pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer'
           >
-            <option value="">全部分类</option>
-            {categoryStats.map(stat => (
+            <option value=''>全部分类</option>
+            {categoryStats.map((stat) => (
               <option key={stat.id} value={stat.name}>
                 {stat.name} ({stat.count})
               </option>
@@ -243,26 +252,28 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
 
       {/* Channel Grid/List */}
       {filteredChannels.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">未找到匹配的频道</p>
+        <div className='text-center py-12'>
+          <p className='text-gray-500 dark:text-gray-400'>未找到匹配的频道</p>
           {(searchQuery || selectedCategory) && (
             <button
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory('');
               }}
-              className="mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              className='mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300'
             >
               清除筛选条件
             </button>
           )}
         </div>
       ) : (
-        <div className={
-          viewMode === 'grid' 
-            ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
-            : 'space-y-2'
-        }>
+        <div
+          className={
+            viewMode === 'grid'
+              ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
+              : 'space-y-2'
+          }
+        >
           {filteredChannels.map((channel) => (
             <LiveChannelCard
               key={channel.id}
@@ -271,7 +282,11 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
               onFavorite={handleToggleFavorite}
               isFavorite={favorites.includes(channel.id)}
               showCategory={!selectedCategory}
-              className={viewMode === 'list' ? 'flex flex-row items-center space-x-4' : ''}
+              className={
+                viewMode === 'list'
+                  ? 'flex flex-row items-center space-x-4'
+                  : ''
+              }
             />
           ))}
         </div>
@@ -279,19 +294,21 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
 
       {/* Category Statistics */}
       {!searchQuery && !selectedCategory && categoryStats.length > 0 && (
-        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">频道分类</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {categoryStats.map(stat => (
+        <div className='mt-8 pt-8 border-t border-gray-200 dark:border-gray-700'>
+          <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-4'>
+            频道分类
+          </h3>
+          <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3'>
+            {categoryStats.map((stat) => (
               <button
                 key={stat.id}
                 onClick={() => setSelectedCategory(stat.name)}
-                className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+                className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left'
               >
-                <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <div className='text-sm font-medium text-gray-900 dark:text-white truncate'>
                   {stat.name}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
                   {stat.count} 个频道
                 </div>
               </button>

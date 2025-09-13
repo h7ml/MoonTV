@@ -46,11 +46,11 @@ export const LiveChannelCard: React.FC<LiveChannelCardProps> = ({
   const getFormatIcon = (format?: string) => {
     switch (format) {
       case 'HLS':
-        return <Signal className="w-3 h-3" />;
+        return <Signal className='w-3 h-3' />;
       case 'RTMP':
-        return <Clock className="w-3 h-3" />;
+        return <Clock className='w-3 h-3' />;
       default:
-        return <Signal className="w-3 h-3" />;
+        return <Signal className='w-3 h-3' />;
     }
   };
 
@@ -60,35 +60,42 @@ export const LiveChannelCard: React.FC<LiveChannelCardProps> = ({
       onClick={handlePlay}
     >
       {/* Channel Logo/Thumbnail */}
-      <div className="relative aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg overflow-hidden">
+      <div className='relative aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg overflow-hidden'>
         {channel.logo ? (
           <Image
             src={channel.logo}
             alt={channel.name}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className='object-cover'
+            sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-white font-bold text-lg text-center px-4">
+          <div className='w-full h-full flex items-center justify-center'>
+            <div className='text-white font-bold text-lg text-center px-4'>
               {channel.name.substring(0, 2)}
             </div>
           </div>
         )}
-        
+
         {/* Play Button Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="bg-white bg-opacity-90 rounded-full p-3">
-              <Play className="w-6 h-6 text-gray-900 ml-0.5" fill="currentColor" />
+        <div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center'>
+          <div className='opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
+            <div className='bg-white bg-opacity-90 rounded-full p-3'>
+              <Play
+                className='w-6 h-6 text-gray-900 ml-0.5'
+                fill='currentColor'
+              />
             </div>
           </div>
         </div>
 
         {/* Quality Badge */}
         {channel.quality && (
-          <div className={`absolute top-2 left-2 ${getQualityColor(channel.quality)} text-white text-xs px-2 py-1 rounded`}>
+          <div
+            className={`absolute top-2 left-2 ${getQualityColor(
+              channel.quality
+            )} text-white text-xs px-2 py-1 rounded`}
+          >
             {channel.quality}
           </div>
         )}
@@ -103,57 +110,64 @@ export const LiveChannelCard: React.FC<LiveChannelCardProps> = ({
                 : 'bg-black bg-opacity-50 text-white hover:bg-opacity-70'
             }`}
           >
-            <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
+            <Star
+              className='w-4 h-4'
+              fill={isFavorite ? 'currentColor' : 'none'}
+            />
           </button>
         )}
 
         {/* Format Icon */}
-        <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white p-1 rounded">
+        <div className='absolute bottom-2 left-2 bg-black bg-opacity-50 text-white p-1 rounded'>
           {getFormatIcon(channel.format)}
         </div>
       </div>
 
       {/* Channel Info */}
-      <div className="p-3">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-gray-900 dark:text-white truncate flex-1">
+      <div className='p-3'>
+        <div className='flex items-start justify-between mb-2'>
+          <h3 className='font-semibold text-gray-900 dark:text-white truncate flex-1'>
             {channel.name}
           </h3>
           {channel.urls.length > 1 && (
-            <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+            <span className='text-xs text-gray-500 ml-2 flex-shrink-0'>
               {channel.urls.length} 源
             </span>
           )}
         </div>
 
         {showCategory && (
-          <p className="text-sm text-gray-600 dark:text-gray-300 truncate mb-2">
+          <p className='text-sm text-gray-600 dark:text-gray-300 truncate mb-2'>
             {channel.category}
           </p>
         )}
 
         {channel.description && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+          <p className='text-xs text-gray-500 dark:text-gray-400 line-clamp-2'>
             {channel.description}
           </p>
         )}
 
         {/* Channel Stats */}
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center space-x-2">
+        <div className='flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700'>
+          <div className='flex items-center space-x-2'>
             {channel.language && (
-              <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
+              <span className='text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded'>
                 {channel.language}
               </span>
             )}
             {channel.country && (
-              <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded">
+              <span className='text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded'>
                 {channel.country}
               </span>
             )}
           </div>
-          
-          <div className={`w-2 h-2 rounded-full ${channel.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+
+          <div
+            className={`w-2 h-2 rounded-full ${
+              channel.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
         </div>
       </div>
     </div>
