@@ -5,6 +5,8 @@ import { getStorage } from '@/lib/db';
 import { AdminConfig } from './admin.types';
 import runtimeConfig from './runtime';
 
+import { LiveSourceConfig } from '@/types/live';
+
 export interface ApiSite {
   key: string;
   api: string;
@@ -22,6 +24,13 @@ interface ConfigFileStruct {
     type: 'movie' | 'tv';
     query: string;
   }[];
+  live_sources?: LiveSourceConfig[];
+  live_settings?: {
+    enabled?: boolean;
+    default_quality?: string;
+    auto_play?: boolean;
+    show_thumbnails?: boolean;
+  };
 }
 
 export const API_CONFIG = {
@@ -506,4 +515,77 @@ export async function getAvailableApiSites(): Promise<ApiSite[]> {
     api: s.api,
     detail: s.detail,
   }));
+}
+
+// Live streaming configuration functions
+export async function getLiveSourcesConfig(): Promise<LiveSourceConfig[]> {
+  const config = await getConfig();
+  const fileConfig = await getFileConfig();
+  
+  // Merge file config and admin config for live sources
+  const fileSources = fileConfig.live_sources || [];
+  const adminSources = config.LiveSources || [];
+  
+  // Combine and deduplicate by ID
+  const combinedSources = [...fileSources];
+  for (const adminSource of adminSources) {
+    if (!combinedSources.find(s => s.id === adminSource.id)) {
+      combinedSources.push(adminSource);
+    }
+  }
+  
+  return combinedSources;
+}
+
+export async function saveLiveSourcesConfig(sources: LiveSourceConfig[]): Promise<void> {
+  const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
+  
+  if (storageType !== 'localstorage') {
+    const storage = getStorage();
+    if (storage && typeof (storage as any).updateAdminConfig === 'function') {
+      const config = await getConfig();
+      const updatedConfig = {
+        ...config,
+        LiveSources: sources,
+      };
+      await (storage as any).updateAdminConfig(updatedConfig);
+      cachedConfig = updatedConfig;
+    }
+  }
+}
+
+export async function getLiveSettings() {
+  const config = await getConfig();
+  const fileConfig = await getFileConfig();
+  
+  return {
+    enabled: config.LiveSettings?.enabled ?? fileConfig.live_settings?.enabled ?? true,
+    default_quality: config.LiveSettings?.default_quality ?? fileConfig.live_settings?.default_quality ?? 'HD',
+    auto_play: config.LiveSettings?.auto_play ?? fileConfig.live_settings?.auto_play ?? true,
+    show_thumbnails: config.LiveSettings?.show_thumbnails ?? fileConfig.live_settings?.show_thumbnails ?? true,
+  };
+}
+
+export async function saveLiveSettings(settings: any): Promise<void> {
+  const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
+  
+  if (storageType !== 'localstorage') {
+    const storage = getStorage();
+    if (storage && typeof (storage as any).updateAdminConfig === 'function') {
+      const config = await getConfig();
+      const updatedConfig = {
+        ...config,
+        LiveSettings: settings,
+      };
+      await (storage as any).updateAdminConfig(updatedConfig);
+      cachedConfig = updatedConfig;
+    }
+  }
+}
+
+async function getFileConfig(): Promise<ConfigFileStruct> {
+  if (!fileConfig) {
+    await initConfig();
+  }
+  return fileConfig;
 }

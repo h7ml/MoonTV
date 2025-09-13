@@ -1,3 +1,5 @@
+import { LiveSourceConfig } from '@/types/live';
+
 export interface AdminConfig {
   SiteConfig: {
     SiteName: string;
@@ -33,6 +35,13 @@ export interface AdminConfig {
     from: 'config' | 'custom';
     disabled?: boolean;
   }[];
+  LiveSources?: LiveSourceConfig[];
+  LiveSettings?: {
+    enabled?: boolean;
+    default_quality?: string;
+    auto_play?: boolean;
+    show_thumbnails?: boolean;
+  };
 }
 
 export interface AdminConfigResult {
