@@ -84,6 +84,82 @@
     "xiaomaomi": {
       "api": "https://zy.xmm.hk/api.php/provide/vod",
       "name": "小猫咪资源"
+    },
+    "fengchao": {
+      "api": "https://api.fczy888.me/api.php/provide/vod",
+      "name": "蜂巢资源"
+    },
+    "wuxian": {
+      "api": "https://api.wuxianzy.net/api.php/provide/vod",
+      "name": "无限资源"
+    },
+    "youzi": {
+      "api": "https://api.yzzy-api.com/inc/api_mac10.php",
+      "name": "优质资源"
+    },
+    "huawei8": {
+      "api": "https://huaweiba.live/api.php/provide/vod",
+      "name": "华为8资源"
+    },
+    "yingtu": {
+      "api": "https://cj.vodimg.top/api.php/provide/vod",
+      "name": "影图资源"
+    },
+    "bilibili": {
+      "api": "https://www.caiji.cyou/api.php/provide/vod",
+      "name": "789哔哩资源"
+    },
+    "suoni": {
+      "api": "https://suoniapi.com/api.php/provide/vod",
+      "name": "索尼资源"
+    },
+    "hongniu": {
+      "api": "https://www.hongniuzy2.com/api.php/provide/vod",
+      "name": "红牛资源"
+    },
+    "guangsu": {
+      "api": "http://api.guangsuapi.com/api.php/provide/vod",
+      "name": "光速资源"
+    },
+    "kuaiche": {
+      "api": "https://caiji.kuaichezy.org/api.php/provide/vod",
+      "name": "快车资源"
+    },
+    "jiuling": {
+      "api": "https://oknnews.com/api.php/provide/vod",
+      "name": "九零资源"
+    },
+    "siquan": {
+      "api": "https://pg.fenwe078.cf/api.php/provide/vod",
+      "name": "四圈资源"
+    },
+    "okzyw": {
+      "api": "https://okzyw9.com/api.php/provide/vod",
+      "name": "OK资源网"
+    },
+    "zuida_new": {
+      "api": "https://zuida.xyz/api.php/provide/vod",
+      "name": "最大采集"
+    },
+    "haohua": {
+      "api": "https://hhzyapi.com/api.php/provide/vod",
+      "name": "豪华资源"
+    },
+    "niuniu": {
+      "api": "https://api.niuniuzy.me/api.php/provide/vod",
+      "name": "牛牛资源"
+    },
+    "tyys": {
+      "api": "https://tyyszyapi.com/api.php/provide/vod",
+      "name": "天涯资源网"
+    },
+    "wolong_caiji": {
+      "api": "https://collect.wolongzy.cc/api.php/provide/vod",
+      "name": "卧龙采集资源"
+    },
+    "jisu_caiji": {
+      "api": "https://jszyapi.com/api.php/provide/vod",
+      "name": "极速采集资源"
     }
   }
 }
