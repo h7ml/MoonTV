@@ -9,6 +9,16 @@ const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
 
+  experimental: {
+    // Disable static optimization for pages with dynamic content
+    staticGenerationBoundary: false,
+  },
+
+  // Skip static generation for dynamic pages
+  async rewrites() {
+    return [];
+  },
+
   // Uncoment to add domain whitelist
   images: {
     unoptimized: true,
