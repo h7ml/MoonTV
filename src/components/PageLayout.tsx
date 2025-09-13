@@ -1,9 +1,7 @@
-import { Suspense } from 'react';
-
 import { BackButton } from './BackButton';
+import ClientSidebar from './ClientSidebar';
 import MobileBottomNav from './MobileBottomNav';
 import MobileHeader from './MobileHeader';
-import Sidebar from './Sidebar';
 import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
 
@@ -22,17 +20,7 @@ const PageLayout = ({ children, activePath = '/' }: PageLayoutProps) => {
       <div className='flex md:grid md:grid-cols-[auto_1fr] w-full min-h-screen md:min-h-auto'>
         {/* 侧边栏 - 桌面端显示，移动端隐藏 */}
         <div className='hidden md:block'>
-          <Suspense
-            fallback={
-              <div className='w-64 h-screen bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800'>
-                <div className='flex items-center justify-center h-16'>
-                  <div className='animate-pulse bg-gray-300 dark:bg-gray-700 rounded w-20 h-6'></div>
-                </div>
-              </div>
-            }
-          >
-            <Sidebar activePath={activePath} />
-          </Suspense>
+          <ClientSidebar activePath={activePath} />
         </div>
 
         {/* 主内容区域 */}
