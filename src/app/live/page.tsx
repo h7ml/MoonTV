@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent static generation issues with localStorage
+export const dynamic = 'force-dynamic';
+
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 

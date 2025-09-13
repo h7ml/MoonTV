@@ -2,6 +2,9 @@
 
 'use client';
 
+// Force dynamic rendering to prevent static generation issues with useSearchParams and localStorage
+export const dynamic = 'force-dynamic';
+
 import Artplayer from 'artplayer';
 import Hls from 'hls.js';
 import { Heart } from 'lucide-react';

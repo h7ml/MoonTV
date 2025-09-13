@@ -1,6 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps, @typescript-eslint/no-explicit-any */
 'use client';
 
+// Force dynamic rendering to prevent static generation issues with useSearchParams and localStorage
+export const dynamic = 'force-dynamic';
+
 import { ChevronUp, Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
