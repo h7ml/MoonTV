@@ -16,7 +16,7 @@ import {
   Wifi,
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import PageLayout from '@/components/PageLayout';
 
@@ -67,6 +67,90 @@ export default function LivePlayPage() {
       setIsLoading(false);
     }
   }, [searchParams]);
+
+  const loadVideo = useCallback(async () => {
+    if (!channel || !videoRef.current) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      setStreamStatus('connecting');
+
+      const video = videoRef.current;
+      const originalUrl = channel.urls[currentUrlIndex];
+      const url = processUrl(originalUrl);
+
+      // Check if HLS.js is supported for .m3u8 files
+      if (url.includes('.m3u8') && window.Hls?.isSupported()) {
+        const hls = new window.Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+
+        hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+          setIsLoading(false);
+          setStreamStatus('connected');
+
+          // 检测流质量
+          if (hls.levels && hls.levels.length > 0) {
+            const currentLevel = hls.levels[hls.currentLevel];
+            if (currentLevel) {
+              setStreamQuality(`${currentLevel.height}p`);
+            }
+          }
+
+          video.play().catch(() => {
+            setError('播放失败，请尝试其他源');
+            setStreamStatus('error');
+          });
+        });
+
+        hls.on(
+          window.Hls.Events.ERROR,
+          (_event: string, data: { fatal?: boolean; details?: string }) => {
+            if (data.fatal) {
+              setError(`播放错误: ${data.details}`);
+              setIsLoading(false);
+              setStreamStatus('error');
+            }
+          }
+        );
+
+        // 存储 hls 实例以便后续清理
+        video.hls = hls;
+      } else {
+        // Fallback to native video playback
+        video.src = url;
+        video.load();
+
+        video.addEventListener('loadeddata', () => {
+          setIsLoading(false);
+          setStreamStatus('connected');
+          video.play().catch(() => {
+            setError('播放失败，请尝试其他源');
+            setStreamStatus('error');
+          });
+        });
+
+        video.addEventListener('error', () => {
+          setError('加载视频流失败');
+          setIsLoading(false);
+          setStreamStatus('error');
+        });
+      }
+
+      // Set up video event listeners
+      video.addEventListener('play', () => setIsPlaying(true));
+      video.addEventListener('pause', () => setIsPlaying(false));
+      video.addEventListener('volumechange', () => {
+        setVolume(video.volume);
+        setIsMuted(video.muted);
+      });
+    } catch (err) {
+      setError('初始化播放器失败');
+      setIsLoading(false);
+      setStreamStatus('error');
+    }
+  }, [channel, currentUrlIndex]);
 
   // Load video when channel is set
   useEffect(() => {
@@ -133,87 +217,6 @@ export default function LivePlayPage() {
     }
 
     return url;
-  };
-
-  const loadVideo = async () => {
-    if (!channel || !videoRef.current) return;
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      setStreamStatus('connecting');
-
-      const video = videoRef.current;
-      const originalUrl = channel.urls[currentUrlIndex];
-      const url = processUrl(originalUrl);
-
-      // Check if HLS.js is supported for .m3u8 files
-      if (url.includes('.m3u8') && window.Hls?.isSupported()) {
-        const hls = new window.Hls();
-        hls.loadSource(url);
-        hls.attachMedia(video);
-
-        hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-          setIsLoading(false);
-          setStreamStatus('connected');
-
-          // 检测流质量
-          if (hls.levels && hls.levels.length > 0) {
-            const currentLevel = hls.levels[hls.currentLevel];
-            if (currentLevel) {
-              setStreamQuality(`${currentLevel.height}p`);
-            }
-          }
-
-          video.play().catch(() => {
-            setError('播放失败，请尝试其他源');
-            setStreamStatus('error');
-          });
-        });
-
-        hls.on(window.Hls.Events.ERROR, (_event: string, data: { fatal?: boolean; details?: string }) => {
-          if (data.fatal) {
-            setError(`播放错误: ${data.details}`);
-            setIsLoading(false);
-            setStreamStatus('error');
-          }
-        });
-
-        // 存储 hls 实例以便后续清理
-        video.hls = hls;
-      } else {
-        // Fallback to native video playback
-        video.src = url;
-        video.load();
-
-        video.addEventListener('loadeddata', () => {
-          setIsLoading(false);
-          setStreamStatus('connected');
-          video.play().catch(() => {
-            setError('播放失败，请尝试其他源');
-            setStreamStatus('error');
-          });
-        });
-
-        video.addEventListener('error', () => {
-          setError('加载视频流失败');
-          setIsLoading(false);
-          setStreamStatus('error');
-        });
-      }
-
-      // Set up video event listeners
-      video.addEventListener('play', () => setIsPlaying(true));
-      video.addEventListener('pause', () => setIsPlaying(false));
-      video.addEventListener('volumechange', () => {
-        setVolume(video.volume);
-        setIsMuted(video.muted);
-      });
-    } catch (err) {
-      setError('初始化播放器失败');
-      setIsLoading(false);
-      setStreamStatus('error');
-    }
   };
 
   const handlePlayPause = () => {
