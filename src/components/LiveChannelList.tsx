@@ -282,11 +282,8 @@ export const LiveChannelList: React.FC<LiveChannelListProps> = ({
               onFavorite={handleToggleFavorite}
               isFavorite={favorites.includes(channel.id)}
               showCategory={!selectedCategory}
-              className={
-                viewMode === 'list'
-                  ? 'flex flex-row items-center space-x-4'
-                  : ''
-              }
+              viewMode={viewMode}
+              className={viewMode === 'list' ? '' : ''}
             />
           ))}
         </div>
