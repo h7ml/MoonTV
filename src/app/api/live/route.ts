@@ -88,19 +88,40 @@ async function handleGetCategories() {
 async function handleGetChannels(searchParams: URLSearchParams) {
   const categories = await getChannelsData();
   const categoryId = searchParams.get('category');
+  const categoryName = searchParams.get('category'); // Support both id and name
+  const searchQuery = searchParams.get('q');
   const page = parseInt(searchParams.get('page') || '1');
   const limit = parseInt(searchParams.get('limit') || '50');
   const sort = searchParams.get('sort') || 'name';
 
   let allChannels: LiveChannel[] = [];
 
-  if (categoryId) {
-    const category = categories.find((cat) => cat.id === categoryId);
+  // Get channels based on category filter
+  if (categoryName) {
+    // Filter by category name
+    const category = categories.find(
+      (cat) => cat.name === categoryName || cat.id === categoryId
+    );
     if (category) {
       allChannels = category.channels;
     }
   } else {
+    // Get all channels from all categories
     allChannels = categories.flatMap((cat) => cat.channels);
+  }
+
+  // Apply search filter
+  if (searchQuery && searchQuery.trim()) {
+    const query = searchQuery.toLowerCase();
+    allChannels = allChannels.filter(
+      (channel) =>
+        channel.name.toLowerCase().includes(query) ||
+        channel.category.toLowerCase().includes(query) ||
+        (channel.description &&
+          channel.description.toLowerCase().includes(query)) ||
+        (channel.tags &&
+          channel.tags.some((tag) => tag.toLowerCase().includes(query)))
+    );
   }
 
   // Sort channels
