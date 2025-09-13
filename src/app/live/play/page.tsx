@@ -16,13 +16,19 @@ import {
   Wifi,
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import PageLayout from '@/components/PageLayout';
 
 import { LiveChannel } from '@/types/live';
 
-export default function LivePlayPage() {
+function LivePlayContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -67,6 +73,40 @@ export default function LivePlayPage() {
       setIsLoading(false);
     }
   }, [searchParams]);
+
+  const processUrl = (url: string) => {
+    // 如果当前页面是 HTTP 访问，而直播源是 HTTPS，则使用代理
+    if (
+      typeof window !== 'undefined' &&
+      window.location.protocol === 'http:' &&
+      url.startsWith('https://')
+    ) {
+      // 提取域名和路径
+      const urlObj = new URL(url);
+      const host = urlObj.host;
+      const pathname = urlObj.pathname;
+      const search = urlObj.search;
+
+      // 使用代理路径
+      return `/proxy/${host}${pathname}${search}`;
+    }
+
+    // 如果是 HTTP 源但需要代理，也可以使用 httpproxy
+    if (
+      typeof window !== 'undefined' &&
+      url.startsWith('http://') &&
+      window.location.protocol === 'https:'
+    ) {
+      const urlObj = new URL(url);
+      const host = urlObj.host;
+      const pathname = urlObj.pathname;
+      const search = urlObj.search;
+
+      return `/httpproxy/${host}${pathname}${search}`;
+    }
+
+    return url;
+  };
 
   const loadVideo = useCallback(async () => {
     if (!channel || !videoRef.current) return;
@@ -184,40 +224,6 @@ export default function LivePlayPage() {
     return () =>
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
-
-  const processUrl = (url: string) => {
-    // 如果当前页面是 HTTP 访问，而直播源是 HTTPS，则使用代理
-    if (
-      typeof window !== 'undefined' &&
-      window.location.protocol === 'http:' &&
-      url.startsWith('https://')
-    ) {
-      // 提取域名和路径
-      const urlObj = new URL(url);
-      const host = urlObj.host;
-      const pathname = urlObj.pathname;
-      const search = urlObj.search;
-
-      // 使用代理路径
-      return `/proxy/${host}${pathname}${search}`;
-    }
-
-    // 如果是 HTTP 源但需要代理，也可以使用 httpproxy
-    if (
-      typeof window !== 'undefined' &&
-      url.startsWith('http://') &&
-      window.location.protocol === 'https:'
-    ) {
-      const urlObj = new URL(url);
-      const host = urlObj.host;
-      const pathname = urlObj.pathname;
-      const search = urlObj.search;
-
-      return `/httpproxy/${host}${pathname}${search}`;
-    }
-
-    return url;
-  };
 
   const handlePlayPause = () => {
     if (!videoRef.current) return;
@@ -686,5 +692,24 @@ export default function LivePlayPage() {
         )}
       </div>
     </PageLayout>
+  );
+}
+
+export default function LivePlayPage() {
+  return (
+    <Suspense
+      fallback={
+        <PageLayout>
+          <div className='flex items-center justify-center min-h-screen'>
+            <div className='text-center'>
+              <div className='animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 mb-6 mx-auto'></div>
+              <p className='text-gray-600 dark:text-gray-300'>加载中...</p>
+            </div>
+          </div>
+        </PageLayout>
+      }
+    >
+      <LivePlayContent />
+    </Suspense>
   );
 }
